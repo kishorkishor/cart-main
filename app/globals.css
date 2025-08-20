@@ -1,0 +1,404 @@
+/**
+ * Global Styles for China Wholesale Ecommerce Platform
+ * 
+ * This file contains all global CSS styles, Tailwind imports,
+ * and custom utility classes for the ecommerce platform.
+ * 
+ * @author China Wholesale Dev Team
+ * @version 1.0.0
+ */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Global Base Styles */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-brand-background text-brand-secondary font-sans antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Heading Styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold text-brand-secondary;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl leading-tight;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl leading-tight;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl lg:text-4xl leading-tight;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl lg:text-3xl leading-tight;
+  }
+  
+  /* Paragraph Styles */
+  p {
+    @apply text-gray-600 leading-relaxed;
+  }
+  
+  /* Link Styles */
+  a {
+    @apply transition-colors duration-200;
+  }
+  
+  /* Focus Styles for Accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2 ring-offset-brand-background;
+  }
+  
+  /* Selection Styles */
+  ::selection {
+    @apply bg-brand-primary text-white;
+  }
+  
+  ::-moz-selection {
+    @apply bg-brand-primary text-white;
+  }
+}
+
+/* Component Layer Styles */
+@layer components {
+  /* Container Styles */
+  .container {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+  
+  .container-narrow {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl;
+  }
+  
+  /* Button Base Styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-brand-primary text-white hover:bg-opacity-90 focus:ring-brand-primary shadow-brand;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-brand-secondary text-white hover:bg-gray-800 focus:ring-brand-secondary;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white focus:ring-brand-primary;
+  }
+  
+  /* Input Styles */
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-colors duration-200 bg-white text-brand-secondary placeholder-gray-400;
+  }
+  
+  .input-error {
+    @apply input border-red-500 focus:ring-red-500;
+  }
+  
+  /* Label Styles */
+  .label {
+    @apply block text-sm font-medium text-brand-secondary mb-2;
+  }
+  
+  .label-required::after {
+    @apply text-red-500 ml-1;
+    content: '*';
+  }
+  
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden;
+  }
+  
+  .card-hover {
+    @apply card transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
+  }
+  
+  /* Section Styles */
+  .section {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+  
+  /* Loading States */
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse;
+  }
+  
+  .spinner {
+    @apply inline-block w-4 h-4 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin;
+  }
+  
+  /* Ecommerce specific styles */
+  .product-card {
+    @apply card-hover;
+  }
+  
+  .product-card img {
+    @apply w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105;
+  }
+  
+  .price {
+    @apply text-lg font-bold text-brand-primary;
+  }
+  
+  .price-sale {
+    @apply text-sm text-gray-500 line-through;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply badge bg-green-100 text-green-800;
+  }
+  
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-error {
+    @apply badge bg-red-100 text-red-800;
+  }
+  
+  .badge-info {
+    @apply badge bg-blue-100 text-blue-800;
+  }
+  
+  /* Cart styles */
+  .cart-item {
+    @apply flex items-center space-x-4 p-4 border-b border-gray-200 last:border-b-0;
+  }
+  
+  .quantity-input {
+    @apply w-16 text-center border border-gray-300 rounded px-2 py-1;
+  }
+  
+  /* Order status styles */
+  .status-pending {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+  
+  .status-confirmed {
+    @apply badge bg-blue-100 text-blue-800;
+  }
+  
+  .status-shipped {
+    @apply badge bg-purple-100 text-purple-800;
+  }
+  
+  .status-delivered {
+    @apply badge bg-green-100 text-green-800;
+  }
+  
+  .status-cancelled {
+    @apply badge bg-red-100 text-red-800;
+  }
+}
+
+/* Utility Layer Styles */
+@layer utilities {
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+  }
+  
+  /* Dark mode utilities */
+  .dark-bg {
+    @apply dark:bg-gray-900;
+  }
+  
+  .dark-text {
+    @apply dark:text-gray-100;
+  }
+  
+  .dark-border {
+    @apply dark:border-gray-700;
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+/* Dark mode enhancements */
+.dark {
+  --dw-bg: #0f1115;
+  --dw-bg-elevated: #171922;
+  --dw-bg-surface: #1d2030;
+  --dw-border: #272a3a;
+  --dw-text: #e7eaf3;
+  --dw-text-muted: #b7bbcc;
+  --dw-primary: #3b82f6;
+  --dw-primary-600: #2563eb;
+  --dw-accent: #22d3ee;
+  color-scheme: dark;
+}
+
+.dark body {
+  background: var(--dw-bg) !important;
+  color: var(--dw-text) !important;
+}
+
+.dark .card {
+  background: var(--dw-bg-elevated) !important;
+  border: 1px solid var(--dw-border) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5) !important;
+}
+
+.dark .btn-primary {
+  background: var(--dw-primary) !important;
+  border-color: var(--dw-primary) !important;
+  color: #fff !important;
+}
+
+.dark .btn-primary:hover {
+  background: var(--dw-primary-600) !important;
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.25) !important;
+}
+
+.dark .input {
+  background: var(--dw-bg-elevated) !important;
+  border: 1px solid var(--dw-border) !important;
+  color: var(--dw-text) !important;
+}
+
+.dark .input:focus {
+  border-color: var(--dw-primary) !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+}
+
+.dark .input::placeholder {
+  color: var(--dw-text-muted) !important;
+}
+
+/* Convert brand-primary to electric blue in dark mode */
+.dark .bg-brand-primary {
+  background-color: var(--dw-primary) !important;
+}
+
+.dark .text-brand-primary {
+  color: var(--dw-primary) !important;
+}
+
+.dark .border-brand-primary {
+  border-color: var(--dw-primary) !important;
+}
+
+/* Dark mode text fixes */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: var(--dw-text) !important;
+}
+
+.dark p, .dark span, .dark li, .dark label {
+  color: var(--dw-text-muted) !important;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    @apply text-black bg-white;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn-primary {
+    @apply bg-black text-white border-2 border-black;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-primary rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-opacity-80;
+}
+
+.dark::-webkit-scrollbar-track {
+  background: var(--dw-bg-surface);
+}
+
+.dark::-webkit-scrollbar-thumb {
+  background: var(--dw-primary);
+}
+
+

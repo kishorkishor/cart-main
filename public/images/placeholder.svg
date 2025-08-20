@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Placeholder image">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e5e7eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cbd5e1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#grad)"/>
+  <g fill="none" stroke="#94a3b8" stroke-width="8">
+    <rect x="64" y="96" width="384" height="256" rx="16" ry="16"/>
+    <circle cx="168" cy="176" r="40"/>
+    <path d="M96 320l96-80 80 64 80-64 64 80"/>
+  </g>
+  <text x="50%" y="456" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#64748b">Image Placeholder</text>
+</svg>
+
