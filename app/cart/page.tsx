@@ -29,17 +29,27 @@ export default function CartPage() {
   }, []);
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemoveItem(productId);
-    } else {
-      update(productId, newQuantity);
-      toast.success('Quantity updated');
+    try {
+      if (newQuantity <= 0) {
+        handleRemoveItem(productId);
+      } else {
+        update(productId, newQuantity);
+        toast.success('Quantity updated');
+      }
+    } catch (error) {
+      toast.error('Failed to update quantity');
+      console.error('Quantity update error:', error);
     }
   };
 
   const handleRemoveItem = (productId: string) => {
-    remove(productId);
-    toast.success('Item removed from cart');
+    try {
+      remove(productId);
+      toast.success('Item removed from cart');
+    } catch (error) {
+      toast.error('Failed to remove item');
+      console.error('Remove item error:', error);
+    }
   };
 
   const handleClearCart = () => {
@@ -67,11 +77,11 @@ export default function CartPage() {
         <div className="max-w-4xl mx-auto">
           <div className="skeleton h-8 w-48 mb-8"></div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="skeleton h-32 rounded-lg"></div>
-              ))}
-            </div>
+                          <div className="lg:col-span-2 space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={`skeleton-${i}`} className="skeleton h-32 rounded-lg"></div>
+                ))}
+              </div>
             <div className="skeleton h-96 rounded-lg"></div>
           </div>
         </div>
@@ -113,7 +123,7 @@ export default function CartPage() {
           <div>
             <h1 className="text-3xl font-bold mb-1">Shopping Cart</h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {count} {count === 1 ? 'item' : 'items'} in your cart
+              {count()} {count() === 1 ? 'item' : 'items'} in your cart
             </p>
           </div>
           <button
@@ -139,14 +149,20 @@ export default function CartPage() {
                 >
                   <div className="flex items-start gap-4">
                     {/* Product Image */}
-                    <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                       <img
                         src={item.image || '/images/products/placeholder.jpg'}
                         alt={item.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const el = e.currentTarget as HTMLImageElement;
-                          el.src = '/images/products/placeholder.jpg';
+                          if (el.src !== '/images/products/placeholder.jpg') {
+                            el.src = '/images/products/placeholder.jpg';
+                          }
+                        }}
+                        onLoad={(e) => {
+                          const el = e.currentTarget as HTMLImageElement;
+                          el.style.background = 'transparent';
                         }}
                       />
                     </div>
@@ -160,7 +176,7 @@ export default function CartPage() {
                         {item.title}
                       </Link>
                       <p className="text-brand-primary font-medium mt-1">
-                        {formatCurrency(item.price)}
+                        {formatCurrency(item.price || 0)}
                       </p>
 
                       {/* Quantity Controls */}
@@ -192,7 +208,7 @@ export default function CartPage() {
                     {/* Item Total & Remove */}
                     <div className="text-right">
                       <p className="font-semibold text-lg mb-2">
-                        {formatCurrency(item.price * item.quantity)}
+                        {formatCurrency((item.price || 0) * (item.quantity || 1))}
                       </p>
                       <button
                         onClick={() => handleRemoveItem(item.productId)}
