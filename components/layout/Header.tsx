@@ -60,6 +60,7 @@ export default function Header() {
           <Link 
             href="/cart" 
             className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-brand-primary dark:hover:text-brand-primary transition-colors"
+            title={`Cart ${mounted ? `(${count} items)` : ''}`}
           >
             <ShoppingCart className="w-6 h-6" />
             {mounted && count > 0 && (
