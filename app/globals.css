@@ -282,6 +282,43 @@
   color-scheme: dark;
 }
 
+/* Prevent layout shift for badges */
+.badge-container {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 10;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  flex-shrink: 0;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth transitions for cart/wishlist counts */
+.count-badge {
+  transition: opacity 0.2s ease-in-out;
+  transform-origin: center;
+  will-change: opacity;
+  line-height: 1;
+  text-align: center;
+  width: 20px;
+  height: 20px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Ensure badges don't cause layout shifts */
+.count-badge:empty {
+  display: none;
+}
+
 .dark body {
   background: var(--dw-bg) !important;
   color: var(--dw-text) !important;
@@ -373,6 +410,19 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Product overlay stability */
+.product-overlay {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity, background-color;
+}
+
+.product-overlay-content {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity;
 }
 
 /* Custom scrollbar */

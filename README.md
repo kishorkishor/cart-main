@@ -79,7 +79,7 @@ See [PROJECT_ROADMAP.md](./PROJECT_ROADMAP.md) for detailed development phases a
 - [x] Project structure and configuration
 - [x] China Wholesale theme integration
 - [ ] Customer authentication system
-- [ ] Product catalog and cart
+- [x] Product catalog and cart
 - [ ] Admin panel basics
 - [ ] Order management system
 - [ ] Payment integration

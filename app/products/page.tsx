@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Search, ShoppingCart, Heart, Filter, SortAsc } from 'lucide-react';
 import { useCart } from '@/lib/adapters/cart';
+import { useWishlist } from '@/lib/adapters/wishlist';
 import { getProducts } from '@/lib/adapters/products';
 import { toast } from 'react-hot-toast';
 
@@ -13,10 +14,10 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const { add: addToWishlist, remove: removeFromWishlist, isInWishlist } = useWishlist();
   const cartCount = useCart((state) => state.count());
 
   // Mock categories - in real app, fetch from API
@@ -73,22 +74,28 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
+    console.log('selectedCategory:', selectedCategory, typeof selectedCategory);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, sortBy, sortOrder]);
 
-  const toggleWishlist = (productId: string) => {
-    setWishlist(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(productId)) {
-        newSet.delete(productId);
-        toast.success('Removed from wishlist');
-      } else {
-        newSet.add(productId);
-        toast.success('Added to wishlist');
-      }
-      return newSet;
-    });
+  const toggleWishlist = (product: any) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast.success('Removed from wishlist');
+    } else {
+                        addToWishlist({
+                    productId: product.id,
+                    title: product.title,
+                    price: product.price,
+                    salePrice: product.salePrice,
+                    image: product.image,
+                    shortDescription: product.shortDescription || product.description,
+                    category: typeof product.category === 'string' ? product.category : product.category?.name || 'Unknown',
+                    rating: product.rating || 4.5
+                  });
+      toast.success('Added to wishlist');
+    }
   };
 
   return (
@@ -180,7 +187,7 @@ export default function ProductsPage() {
             {selectedCategory !== 'all' && (
               <span className="flex items-center gap-1">
                 Category: <span className="font-medium text-gray-700 dark:text-gray-300">
-                  {categories.find(c => c.id === selectedCategory)?.name}
+                  {categories.find(c => c.id === selectedCategory)?.name || String(selectedCategory)}
                 </span>
               </span>
             )}
@@ -215,57 +222,99 @@ export default function ProductsPage() {
           {query && <p className="text-sm text-gray-500 mt-2">Try adjusting your search terms or filters.</p>}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {products.map((p) => (
             <motion.div
               key={p.id}
-              className="card group overflow-hidden"
-              initial={{ opacity: 0, y: 10 }}
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border-0 overflow-hidden group"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -8 }}
             >
-              <div className="aspect-square overflow-hidden">
+              {/* Image Container - Larger and more prominent */}
+              <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                 <img
                   src={p.images?.[0]?.url || '/images/products/placeholder.jpg'}
                   alt={p.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   onError={(e) => {
                     const el = e.currentTarget as HTMLImageElement;
                     if (el.src.endsWith('/placeholder.jpg')) return;
                     el.src = '/images/products/placeholder.jpg';
                   }}
                 />
+                
+                {/* Sale Badge - More prominent */}
+                {p.salePrice && (
+                  <div className="absolute top-4 left-4 bg-red-600 text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg">
+                    SALE
+                  </div>
+                )}
+
+                {/* Rating Badge - Cleaner design */}
+                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-gray-800 text-xs px-2.5 py-1.5 rounded-full font-medium shadow-lg flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-yellow-500 fill-current" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                  {p.rating?.toFixed(1) || '4.5'}
+                </div>
+
+                {/* Subtle overlay on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
               </div>
-              <div className="p-4">
-                <Link href={`/products/${p.slug || p.id}`} className="block">
-                  <h3 className="font-semibold mb-1 line-clamp-1 hover:text-brand-primary transition-colors">{p.title}</h3>
+
+              {/* Content Section - More spacious and elegant */}
+              <div className="p-6 space-y-4">
+                {/* Title - Larger and more prominent */}
+                <Link href={`/products/${p.slug || p.id}`} className="block group">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-brand-primary transition-colors duration-300">
+                    {p.title}
+                  </h3>
                 </Link>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-3">{p.shortDescription || p.description}</p>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-baseline gap-2">
-                    <span className="price">${(p.salePrice ?? p.price).toFixed(2)}</span>
+
+                {/* Description - Better spacing */}
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                  {p.shortDescription || p.description}
+                </p>
+
+                {/* Price Section - More prominent */}
+                <div className="flex items-baseline justify-between pt-2">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-2xl font-bold text-brand-primary">
+                      ${(p.salePrice ?? p.price).toFixed(2)}
+                    </span>
                     {p.salePrice && (
-                      <span className="price-sale">${p.price.toFixed(2)}</span>
+                      <span className="text-base text-gray-500 line-through">
+                        ${p.price.toFixed(2)}
+                      </span>
                     )}
                   </div>
-                  <Link 
-                    href={`/products/${p.slug || p.id}`}
-                    className="text-sm text-brand-primary hover:text-brand-secondary transition-colors"
+                  
+                  {/* Savings indicator */}
+                  {p.salePrice && (
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                      Save ${(p.price - p.salePrice).toFixed(2)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons - More formal and minimalistic */}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    className={`flex-1 px-2 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${
+                      isInWishlist(p.id)
+                        ? 'bg-red-500 hover:bg-red-600 text-white shadow-sm'
+                        : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                    }`}
+                    onClick={() => toggleWishlist(p)}
                   >
-                    View Details →
-                  </Link>
+                    <Heart className={`w-3 h-3 inline mr-1.5 ${isInWishlist(p.id) ? 'fill-current' : ''}`} />
+                    {isInWishlist(p.id) ? 'Saved' : 'Wishlist'}
+                  </button>
+                  
+                  <AddToCartButton product={p} />
                 </div>
-                <div className="flex items-center gap-2">
-                    <button 
-                      className={`btn-outline px-3 py-1.5 text-sm ${
-                        wishlist.has(p.id) ? 'text-red-600 border-red-300' : ''
-                      }`}
-                      onClick={() => toggleWishlist(p.id)}
-                    >
-                      <Heart className={`w-4 h-4 ${wishlist.has(p.id) ? 'fill-current' : ''}`} />
-                    </button>
-                    <AddToCartButton product={p} />
-                  </div>
-                </div>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -287,8 +336,12 @@ function AddToCartButton({ product }: { product: any }) {
     toast.success('Added to cart');
   };
   return (
-    <button className="btn-primary px-3 py-1.5 text-sm" onClick={onAdd}>
-      <ShoppingCart className="w-4 h-4" />
+    <button 
+      className="flex-1 px-2 py-1.5 bg-brand-primary hover:bg-brand-secondary text-white text-sm font-medium rounded-md transition-all duration-300 shadow-sm hover:shadow-md" 
+      onClick={onAdd}
+    >
+      <ShoppingCart className="w-3 h-3 inline mr-1.5" />
+      Add to Cart
     </button>
   );
 }
