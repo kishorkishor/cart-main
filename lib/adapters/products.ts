@@ -103,6 +103,7 @@ export interface ProductFilters {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+  exclude?: string;
 }
 
 /**

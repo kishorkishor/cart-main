@@ -56,7 +56,6 @@ export default function WishlistPage() {
   const moveToCart = (item: WishlistItem) => {
     try {
       addToCart({
-        id: item.productId,
         productId: item.productId,
         title: item.title,
         price: item.salePrice || item.price,
@@ -127,7 +126,7 @@ export default function WishlistPage() {
   // Get unique categories for filter
   const categories = ['all', ...Array.from(new Set(wishlistItems.map(item => 
     typeof item.category === 'string' ? item.category : item.category?.name || 'Unknown'
-  )))];
+  )))] as string[];
 
   if (!mounted) {
     return (
@@ -239,8 +238,7 @@ export default function WishlistPage() {
               >
                 {categories.map(category => (
                   <option key={category} value={category}>
-                    {category === 'all' ? 'All Categories' : 
-                      (typeof category === 'string' ? category : category?.name || 'Unknown')}
+                    {category === 'all' ? 'All Categories' : category}
                   </option>
                 ))}
               </select>

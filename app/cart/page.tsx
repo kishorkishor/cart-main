@@ -19,7 +19,8 @@ import { toast } from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 
 export default function CartPage() {
-  const { items, remove, update, clear, total, count } = useCart();
+  const { items, remove, update, clear, total } = useCart();
+  const count = useCart((state) => state.count());
   const [mounted, setMounted] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -123,7 +124,7 @@ export default function CartPage() {
           <div>
             <h1 className="text-3xl font-bold mb-1">Shopping Cart</h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {count()} {count() === 1 ? 'item' : 'items'} in your cart
+              {count} {count === 1 ? 'item' : 'items'} in your cart
             </p>
           </div>
           <button

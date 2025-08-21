@@ -29,16 +29,16 @@ export default function ProductDetailPage() {
       try {
         setLoading(true);
         const res = await getProduct(slug);
-        setProduct(res.data);
+        setProduct(res);
         
         // Load related products from same category
-        if (res.data.category) {
+        if (res.category) {
           const related = await getProducts({ 
-            category: res.data.category.slug, 
+            category: res.category.slug, 
             limit: 4,
-            exclude: res.data.id 
+            exclude: res.id 
           });
-          setRelatedProducts(related.data.filter(p => p.id !== res.data.id));
+          setRelatedProducts(related.data.filter(p => p.id !== res.id));
         }
       } catch (e: any) {
         // Fallback to direct API call
