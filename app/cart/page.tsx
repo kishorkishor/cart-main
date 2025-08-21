@@ -20,7 +20,7 @@ import { formatCurrency } from '@/lib/utils';
 
 export default function CartPage() {
   const { items, remove, update, clear, total } = useCart();
-  const count = useCart((state) => state.count());
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
   const [mounted, setMounted] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
