@@ -1,31 +1,62 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Search, ShoppingCart, Heart } from 'lucide-react';
-import { getProducts } from '@/lib/adapters/products';
+import { Search, ShoppingCart, Heart, Filter, SortAsc } from 'lucide-react';
 import { useCart } from '@/lib/adapters/cart';
-import toast from 'react-hot-toast';
+import { getProducts } from '@/lib/adapters/products';
+import { toast } from 'react-hot-toast';
 
 export default function ProductsPage() {
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const cartCount = useCart((state) => state.count());
+
+  // Mock categories - in real app, fetch from API
+  const categories = [
+    { id: 'all', name: 'All Categories' },
+    { id: 'tea-beverages', name: 'Tea & Beverages' },
+    { id: 'fashion-accessories', name: 'Fashion & Accessories' },
+    { id: 'ceramics', name: 'Ceramics & Pottery' },
+    { id: 'art-supplies', name: 'Art Supplies' },
+    { id: 'home-garden', name: 'Home & Garden' }
+  ];
 
   const load = async () => {
     setError(null);
     setLoading(true);
     try {
-      const res = await getProducts({ search: query, limit: 24 });
+      const filters: any = { 
+        search: query, 
+        limit: 24,
+        sortBy,
+        sortOrder
+      };
+      
+      if (selectedCategory !== 'all') {
+        filters.category = selectedCategory;
+      }
+      
+      const res = await getProducts(filters);
       setProducts(res.data);
     } catch (e: any) {
       // Fallback: direct fetch from mock API route
       try {
-        const r = await fetch(`/api/products?limit=24${query ? `&q=${encodeURIComponent(query)}` : ''}`);
+        const params = new URLSearchParams();
+        params.append('limit', '24');
+        if (query) params.append('q', query);
+        if (selectedCategory !== 'all') params.append('category', selectedCategory);
+        if (sortBy) params.append('sort_by', sortBy);
+        if (sortOrder) params.append('sort_order', sortOrder);
+        
+        const r = await fetch(`/api/products?${params.toString()}`);
         if (r.ok) {
           const j = await r.json();
           setProducts(j?.data || []);
@@ -44,7 +75,7 @@ export default function ProductsPage() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedCategory, sortBy, sortOrder]);
 
   const toggleWishlist = (productId: string) => {
     setWishlist(prev => {
@@ -97,6 +128,77 @@ export default function ProductsPage() {
         </div>
       </div>
 
+      {/* Filters and Sorting */}
+      <div className="card p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Filter className="w-4 h-4" />
+            Filters:
+          </div>
+          
+          <select
+            className="input text-sm w-auto min-w-[140px]"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <SortAsc className="w-4 h-4" />
+            Sort:
+          </div>
+
+          <select
+            className="input text-sm w-auto min-w-[100px]"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+            <option value="rating">Rating</option>
+            <option value="created">Newest</option>
+          </select>
+
+          <button
+            className="btn-outline text-sm px-3 py-1.5 h-9 flex items-center justify-center min-w-[40px]"
+            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+            title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+          >
+            {sortOrder === 'asc' ? '↑' : '↓'}
+          </button>
+        </div>
+        
+        {/* Active Filters Summary */}
+        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <span>
+              {products.length} product{products.length !== 1 ? 's' : ''} found
+            </span>
+            {selectedCategory !== 'all' && (
+              <span className="flex items-center gap-1">
+                Category: <span className="font-medium text-gray-700 dark:text-gray-300">
+                  {categories.find(c => c.id === selectedCategory)?.name}
+                </span>
+              </span>
+            )}
+            {query && (
+              <span className="flex items-center gap-1">
+                Search: <span className="font-medium text-gray-700 dark:text-gray-300">"{query}"</span>
+              </span>
+            )}
+            <span className="flex items-center gap-1">
+              Sorted by: <span className="font-medium text-gray-700 dark:text-gray-300">
+                {sortBy === 'name' ? 'Name' : sortBy === 'price' ? 'Price' : sortBy === 'rating' ? 'Rating' : 'Newest'} 
+                {sortOrder === 'asc' ? ' (A-Z)' : ' (Z-A)'}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
       {error && (
         <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 mb-6">{error}</div>
       )}
@@ -110,6 +212,7 @@ export default function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="card p-8 text-center">
           <p className="text-gray-600 dark:text-gray-300">No products found.</p>
+          {query && <p className="text-sm text-gray-500 mt-2">Try adjusting your search terms or filters.</p>}
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -122,13 +225,13 @@ export default function ProductsPage() {
             >
               <div className="aspect-square overflow-hidden">
                 <img
-                  src={p.images?.[0]?.url || '/images/placeholder.svg'}
+                  src={p.images?.[0]?.url || '/images/products/placeholder.jpg'}
                   alt={p.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     const el = e.currentTarget as HTMLImageElement;
-                    if (el.src.endsWith('/placeholder.svg')) return;
-                    el.src = '/images/placeholder.svg';
+                    if (el.src.endsWith('/placeholder.jpg')) return;
+                    el.src = '/images/products/placeholder.jpg';
                   }}
                 />
               </div>

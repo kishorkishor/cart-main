@@ -47,13 +47,52 @@ function filterProducts(products: Product[], params: URLSearchParams) {
   return result;
 }
 
+function sortProducts(products: Product[], sortBy: string, sortOrder: string) {
+  const sorted = [...products];
+  
+  sorted.sort((a, b) => {
+    let aValue: any, bValue: any;
+    
+    switch (sortBy) {
+      case 'price':
+        aValue = a.sale_price ?? a.price;
+        bValue = b.sale_price ?? b.price;
+        break;
+      case 'rating':
+        aValue = a.average_rating || 0;
+        bValue = b.average_rating || 0;
+        break;
+      case 'created':
+        aValue = new Date(a.created_at || 0);
+        bValue = new Date(b.created_at || 0);
+        break;
+      case 'name':
+      default:
+        aValue = a.title.toLowerCase();
+        bValue = b.title.toLowerCase();
+        break;
+    }
+    
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+  
+  return sorted;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
   const limit = Math.max(parseInt(searchParams.get('limit') || '20', 10), 1);
+  const sortBy = searchParams.get('sort_by') || 'name';
+  const sortOrder = searchParams.get('sort_order') || 'asc';
 
-  const filtered = filterProducts(fullData.data, searchParams);
+  let filtered = filterProducts(fullData.data, searchParams);
+  
+  // Apply sorting
+  filtered = sortProducts(filtered, sortBy, sortOrder);
 
   const start = (page - 1) * limit;
   const end = start + limit;

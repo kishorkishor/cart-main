@@ -14,7 +14,7 @@
       "images": [
         {
           "id": "img_001",
-          "url": "/images/products/jasmine-tea-main.jpg",
+          "url": "/images/products/placeholder.jpg",
           "alt": "Premium Jasmine Tea Package",
           "position": 1,
           "thumbnail": "/images/products/thumbs/jasmine-tea-thumb.jpg"
@@ -61,7 +61,7 @@
       "images": [
         {
           "id": "img_002",
-          "url": "/images/products/silk-scarf-main.jpg",
+          "url": "/images/products/placeholder.jpg",
           "alt": "Natural Silk Scarf",
           "position": 1,
           "thumbnail": "/images/products/thumbs/silk-scarf-thumb.jpg"
@@ -126,7 +126,7 @@
       "images": [
         {
           "id": "img_003",
-          "url": "/images/products/porcelain-vase-main.jpg",
+          "url": "/images/products/placeholder.jpg",
           "alt": "Blue and White Porcelain Vase",
           "position": 1,
           "thumbnail": "/images/products/thumbs/porcelain-vase-thumb.jpg"

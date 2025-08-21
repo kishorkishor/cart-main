@@ -3,9 +3,15 @@
 import Link from 'next/link';
 import { ShoppingCart, Package, User, Home, Heart } from 'lucide-react';
 import { useCart } from '@/lib/adapters/cart';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
   const count = useCart((state) => state.count());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
@@ -56,7 +62,7 @@ export default function Header() {
             className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-brand-primary dark:hover:text-brand-primary transition-colors"
           >
             <ShoppingCart className="w-6 h-6" />
-            {count > 0 && (
+            {mounted && count > 0 && (
               <span className="absolute -top-1 -right-1 bg-brand-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                 {count > 99 ? '99+' : count}
               </span>
