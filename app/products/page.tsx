@@ -237,17 +237,24 @@ export default function ProductsPage() {
               </div>
               <div className="p-4">
                 <Link href={`/products/${p.slug || p.id}`} className="block">
-                  <h3 className="font-semibold mb-1 line-clamp-1">{p.title}</h3>
+                  <h3 className="font-semibold mb-1 line-clamp-1 hover:text-brand-primary transition-colors">{p.title}</h3>
                 </Link>
                 <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-3">{p.shortDescription || p.description}</p>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-baseline gap-2">
                     <span className="price">${(p.salePrice ?? p.price).toFixed(2)}</span>
                     {p.salePrice && (
                       <span className="price-sale">${p.price.toFixed(2)}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <Link 
+                    href={`/products/${p.slug || p.id}`}
+                    className="text-sm text-brand-primary hover:text-brand-secondary transition-colors"
+                  >
+                    View Details →
+                  </Link>
+                </div>
+                <div className="flex items-center gap-2">
                     <button 
                       className={`btn-outline px-3 py-1.5 text-sm ${
                         wishlist.has(p.id) ? 'text-red-600 border-red-300' : ''
@@ -259,7 +266,6 @@ export default function ProductsPage() {
                     <AddToCartButton product={p} />
                   </div>
                 </div>
-              </div>
             </motion.div>
           ))}
         </div>
